@@ -1,8 +1,26 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import './App.css';
-import butachan from './img/butachan.png';
+// import butachan from './img/butachan.png';
 import * as serviceWorker from './serviceWorker';
+
+const ThemeContext = React.createContext();
+
+function Toolbar(props){
+    return (
+        <div>
+            <ThemedButton />
+        </div>
+    );
+}
+
+const ThemedButton = () => (
+    <ThemeContext.Consumer>
+        {context=>
+            <button onClick={context.toggleTheme}>{context.theme}</button>
+        }
+    </ThemeContext.Consumer>
+)
 
 function HookExample(){
     const [count, setCount] = useState(0)
@@ -168,6 +186,10 @@ class Clock extends React.Component {
 // const element = <Welcome name="Sara" />;
 
 function App() {
+    
+    const [theme, setTheme] = useState("dark")
+    const toggleTheme = () => setTheme(prev => prev==="dark" ? "light" : "dark" )
+
     return (
         <div>
             <Clock />
@@ -176,23 +198,27 @@ function App() {
             <InputField />
             <Popup />
             <HookExample />
+            <ThemeContext.Provider value={{theme: theme, toggleTheme: toggleTheme}}>
+                <Toolbar  />
+            </ThemeContext.Provider>
+
             {/* <Butachan text="はーい" /> */}
         </div>
     );
 }
 
-function Butachan(props){
-    return (
-        <div id="footer">
-            <div>{props.text}</div> 
-            <div><img src={butachan} alt="ぶたちゃん"/></div>
-        </div>            
-    );
-}
+// function Butachan(props){
+//     return (
+//         <div id="footer">
+//             <div>{props.text}</div> 
+//             <div><img src={butachan} alt="ぶたちゃん"/></div>
+//         </div>            
+//     );
+// }
 
 // ReactDOM.render(<App />, document.getElementById('root'));
 ReactDOM.render(
-    App(),
+    <App />,
     document.getElementById('root')
 );
 
