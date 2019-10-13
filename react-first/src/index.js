@@ -3,6 +3,32 @@ import ReactDOM from 'react-dom';
 import './App.css';
 // import butachan from './img/butachan.png';
 import * as serviceWorker from './serviceWorker';
+import axios from 'axios';
+
+// const API_URL = 'localhost:8080'
+
+const GithubProfile = () => {
+
+    const [content, setContent] = useState("api result")
+    const userName = "teach310"
+    const getProfile = async () => {
+        try {
+            const result = await axios.get(`https://api.github.com/users/${userName}`);
+            console.log(result)
+            console.log(result.data)
+            setContent(JSON.stringify(result.data))
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    return (
+        <div>
+            <button onClick={() => getProfile()}>get profile!</button>
+            {content}
+        </div>
+    )
+}
 
 const ThemeContext = React.createContext();
 
@@ -186,7 +212,7 @@ class Clock extends React.Component {
 // const element = <Welcome name="Sara" />;
 
 function App() {
-    
+    console.log("App");
     const [theme, setTheme] = useState("dark")
     const toggleTheme = () => setTheme(prev => prev==="dark" ? "light" : "dark" )
 
@@ -201,7 +227,7 @@ function App() {
             <ThemeContext.Provider value={{theme: theme, toggleTheme: toggleTheme}}>
                 <Toolbar  />
             </ThemeContext.Provider>
-
+            <GithubProfile />
             {/* <Butachan text="はーい" /> */}
         </div>
     );
