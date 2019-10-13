@@ -7,98 +7,98 @@ import axios from 'axios';
 
 // const API_URL = 'localhost:8080'
 
-const GithubProfile = () => {
+// const GithubProfile = () => {
 
-    const [content, setContent] = useState("api result")
-    const userName = "teach310"
-    const getProfile = async () => {
-        try {
-            const result = await axios.get(`https://api.github.com/users/${userName}`);
-            console.log(result)
-            console.log(result.data)
-            setContent(JSON.stringify(result.data))
-        } catch (error) {
-            console.log(error);
-        }
-    }
+//     const [content, setContent] = useState("api result")
+//     const userName = "teach310"
+//     const getProfile = async () => {
+//         try {
+//             const result = await axios.get(`https://api.github.com/users/${userName}`);
+//             console.log(result)
+//             console.log(result.data)
+//             setContent(JSON.stringify(result.data))
+//         } catch (error) {
+//             console.log(error);
+//         }
+//     }
 
-    return (
-        <div>
-            <button onClick={() => getProfile()}>get profile!</button>
-            {content}
-        </div>
-    )
-}
+//     return (
+//         <div>
+//             <button onClick={() => getProfile()}>get profile!</button>
+//             {content}
+//         </div>
+//     )
+// }
 
-const ThemeContext = React.createContext();
+// const ThemeContext = React.createContext();
 
-function Toolbar(props){
-    return (
-        <div>
-            <ThemedButton />
-        </div>
-    );
-}
+// function Toolbar(props){
+//     return (
+//         <div>
+//             <ThemedButton />
+//         </div>
+//     );
+// }
 
-const ThemedButton = () => (
-    <ThemeContext.Consumer>
-        {context=>
-            <button onClick={context.toggleTheme}>{context.theme}</button>
-        }
-    </ThemeContext.Consumer>
-)
+// const ThemedButton = () => (
+//     <ThemeContext.Consumer>
+//         {context=>
+//             <button onClick={context.toggleTheme}>{context.theme}</button>
+//         }
+//     </ThemeContext.Consumer>
+// )
 
-function HookExample(){
-    const [count, setCount] = useState(0)
+// function HookExample(){
+//     const [count, setCount] = useState(0)
 
-    return (
-        <div>
-            <p>You clicked {count} times</p>
-            <button onClick={()=>setCount(count+1)}>
-                Click me
-            </button>
-        </div>
-    );
-}
+//     return (
+//         <div>
+//             <p>You clicked {count} times</p>
+//             <button onClick={()=>setCount(count+1)}>
+//                 Click me
+//             </button>
+//         </div>
+//     );
+// }
 
-class Popup extends React.Component {
-    constructor(props){
-        super(props);
-        this.state = {
-            value: 'coconut'
-        }
-    }
+// class Popup extends React.Component {
+//     constructor(props){
+//         super(props);
+//         this.state = {
+//             value: 'coconut'
+//         }
+//     }
 
-    handleChange = ev => {
-        this.setState({value: ev.target.value});
-    }
+//     handleChange = ev => {
+//         this.setState({value: ev.target.value});
+//     }
 
-    handleSubmit = ev => {
-        alert("selected: " + this.state.value);
-        ev.preventDefault();
-    }
+//     handleSubmit = ev => {
+//         alert("selected: " + this.state.value);
+//         ev.preventDefault();
+//     }
 
-    render(){
-        return (
-            <form onSubmit={this.handleSubmit}>
-                <label>
-                    Flavor　
-                    <select value={this.state.value} onChange={this.handleChange}>
-                        <option value="grapefruit">Grapefruit</option>
-                        <option value="lime">Lime</option>
-                        <option value="coconut">Coconut</option>
-                        <option value="mango">Mango</option>
-                    </select>
-                </label>
-                <input type="submit" value="Submit"/>
-            </form>
-        );
-    }
-}
+//     render(){
+//         return (
+//             <form onSubmit={this.handleSubmit}>
+//                 <label>
+//                     Flavor　
+//                     <select value={this.state.value} onChange={this.handleChange}>
+//                         <option value="grapefruit">Grapefruit</option>
+//                         <option value="lime">Lime</option>
+//                         <option value="coconut">Coconut</option>
+//                         <option value="mango">Mango</option>
+//                     </select>
+//                 </label>
+//                 <input type="submit" value="Submit"/>
+//             </form>
+//         );
+//     }
+// }
 
 
 class InputField extends React.Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
             value: 'content'
@@ -106,7 +106,7 @@ class InputField extends React.Component {
     }
 
     handleChange = ev => {
-        this.setState({value: ev.target.value});
+        this.setState({ value: ev.target.value });
     }
 
     handleSubmit = ev => {
@@ -114,27 +114,27 @@ class InputField extends React.Component {
         ev.preventDefault();
     }
 
-    render(){
+    render() {
         return (
             <form onSubmit={this.handleSubmit}>
                 <label>
-                    TextArea　
-                    <textarea value={this.state.value} onChange={this.handleChange}/>
+                    TextArea
+                    <textarea value={this.state.value} onChange={this.handleChange} />
                 </label>
-                <input type="submit" value="Submit"/>
+                <input type="submit" value="Submit" />
             </form>
         );
     }
 }
 
 class NameForm extends React.Component {
-    constructor(props){
+    constructor(props) {
         super(props);
-        this.state = {value: ''}
+        this.state = { value: '' }
     }
 
     handleChange = ev => {
-        this.setState({value: ev.target.value});
+        this.setState({ value: ev.target.value });
     }
 
     handleSubmit = ev => {
@@ -146,88 +146,109 @@ class NameForm extends React.Component {
         return (
             <form onSubmit={this.handleSubmit}>
                 <label>
-                    Name:　
+                    Name:
                     <input type="text" value={this.state.value} onChange={this.handleChange} />
                 </label>
-                <input type="submit" value="Submit"/>
+                <input type="submit" value="Submit" />
             </form>
         );
     }
 }
 
-class Toggle extends React.Component {
-    constructor(props){
-        super(props);
-        this.state = {isToggleOn: true};
-    }
 
-    handleClick = () => {
-        this.setState(st => ({
-            isToggleOn: !st.isToggleOn
-        }));
-    }
 
-    render() {
-        return(
-             <button onClick={this.handleClick}>
-                { this.state.isToggleOn ? 'ON' : 'OFF' }
-            </button>
-        );
-    }
-}
+const Toggle = props => (
+    <button onClick={props.handleClick}>
+        {!props.isDone ? '□' : '■'}
+    </button>
+);
 
-class Clock extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {date: new Date()};
-    }
+const TodoItem = props => (
+    <div>
+        <Toggle isDone={props.model.isDone} handleClick={props.handleClick}/>
+        <input type="text" value={props.model.name} onChange={ev => props.handleChangeName(ev.target.value)}/> 
+        <button onClick={props.handleRemove}>×</button>
+    </div>
+)
 
-    componentDidMount() {
-        this.timerID = setInterval(
-            () => this.tick(),
-            1000
-        );
-    }
+const TodoList = props => {
 
-    componentWillUnmount(){
-        clearInterval(this.timerID)
-    }
-
-    tick() {
-        this.setState({
-            date: new Date()
-        });
-    }
-
-    render() {
-        return (
-            <div>
-                <h1>Hello, world!</h1>
-                <h2>It is {this.state.date.toLocaleTimeString()}</h2>
-            </div>
-        );    
-    }
-}
-
-// const element = <Welcome name="Sara" />;
-
-function App() {
-    console.log("App");
-    const [theme, setTheme] = useState("dark")
-    const toggleTheme = () => setTheme(prev => prev==="dark" ? "light" : "dark" )
+    const listItems = props.models.map((m, i) =>
+        <li key={m.id}>
+             <TodoItem model={m} handleClick={() => props.handleClick(i)} handleRemove={() => props.handleRemove(i)} handleChangeName={value => props.handleChangeName(i, value)}/>
+        </li>
+    );
 
     return (
         <div>
-            <Clock />
-            <Toggle />
+            <ul>{listItems}</ul>
+        </div>
+    );
+}
+
+const host = "http://localhost:8080"
+
+function App() {
+
+    const initialModels = [
+        { id: 1, isDone: false, name: "anyTodo1" },
+        { id: 2, isDone: true, name: "anyTodo2" },
+        { id: 3, isDone: true, name: "anyTodo3" },
+    ];
+
+    const [todoModels, setTodoModels] = useState(initialModels);
+
+    const handleClick = i => {
+        const temp = todoModels.slice();
+        temp[i] = Object.assign({}, temp[i], { isDone: !temp[i].isDone});
+        setTodoModels(temp);
+    };
+
+    const handleChangeName = (i, value) => {
+        const temp = todoModels.slice();
+        temp[i] = Object.assign({}, temp[i], { name: value });
+        setTodoModels(temp);
+    }
+
+    const handleRemove = i => {
+        const temp = todoModels.slice();
+        temp.splice(i, 1)
+        setTodoModels(temp);
+    };
+
+    const handleAdd = () => {
+        setTodoModels(prev => prev.concat([{id: prev.length+1, isDone: false, name: "task" }]));
+    };
+
+    const loadTodo = async () => {
+        try {
+            const result = await axios.get(`http://go:8080/load`);
+            console.log(result.data)
+            console.log(result)
+            // setContent(JSON.stringify(result.data))
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    return (
+        <div>
+            <h1>TODOアプリ</h1>
+            <div>
+                <button onClick={loadTodo}>LOAD</button>
+                <button>SAVE</button>
+                <button onClick={handleAdd}>ADD</button>
+            </div>
+            <TodoList models={todoModels} handleClick={handleClick} handleRemove={handleRemove} handleChangeName={handleChangeName}/>
+            {/* <Toggle />
             <NameForm />
             <InputField />
             <Popup />
             <HookExample />
-            <ThemeContext.Provider value={{theme: theme, toggleTheme: toggleTheme}}>
-                <Toolbar  />
+            <ThemeContext.Provider value={{ theme: theme, toggleTheme: toggleTheme }}>
+                <Toolbar />
             </ThemeContext.Provider>
-            <GithubProfile />
+            <GithubProfile /> */}
             {/* <Butachan text="はーい" /> */}
         </div>
     );

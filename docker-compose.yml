@@ -9,4 +9,13 @@ services:
     ports:
       - "3000:3000"
       - "5000:5000"
-      
+  go:
+    image: 'golang:1.12'
+    tty: true
+    volumes:
+      - ./server:/go/src
+    working_dir: /go/src
+    ports:
+      - "8080:8080"
+    expose: 
+      - "8080"
