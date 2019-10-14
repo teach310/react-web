@@ -11,13 +11,23 @@ services:
       - "5000:5000"
     command: yarn start
   go:
-    image: 'golang:1.12'
+    build: docker/go
     tty: true
+    environment:
+      - 'GO111MODULE=on'
     volumes:
       - ./server:/go/src
     working_dir: /go/src
     ports:
       - "8080:8080"
-    expose: 
-      - "8080"
     command: go run main.go
+  mysql:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
+    volumes:
+      - "./mysql/db-data/:/var/lib/mysql" # データ永続化
+      - "./mysql/my.cnf:/etc/mysql/conf.d/my.cnf" # 日本語をデータとして使うために必要
+      - "./mysql/init/:/docker-entrypoint-initdb.d" # データ構築時に1度だけ呼ばれる。初期化用

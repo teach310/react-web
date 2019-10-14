@@ -1,43 +1,44 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"todo/domain"
+	"todo/infra/mysql"
 )
 
-type Todo struct {
-	ID     int    `json:"id"`
-	IsDone bool   `json:"isDone"`
-	Name   string `json:"name"`
-}
-
 func main() {
-	// http.HandleFunc("/", handler)
-	files := http.FileServer(http.Dir("./public"))
-	http.Handle("/page/", http.StripPrefix("/page/", files))
-	http.Handle("/admin/", http.StripPrefix("/admin/", http.FileServer(http.Dir("./build"))))
 
-	// http.Handle("/", http.FileServer(http.Dir("./build")))
+	mysql.Connect()
+	defer mysql.CloseConnect()
+	mysql.Migrate()
 
+	// files := http.FileServer(http.Dir("./public"))
+	// http.Handle("/page/", http.StripPrefix("/page/", files))
+	// http.Handle("/admin/", http.StripPrefix("/admin/", http.FileServer(http.Dir("./build"))))
+
+	register()
 	fmt.Println("Server Started Port 8080")
-	http.HandleFunc("/load", loadTodo)
 	http.ListenAndServe(":8080", nil)
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Hello World")
+func allowAccessControl(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// CORS対策
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+
+		if r.Method == "OPTIONS" { // 認証用
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		next.ServeHTTP(w, r)
+	}
 }
 
-func loadTodo(w http.ResponseWriter, r *http.Request) {
-	todoModels := []Todo{
-		Todo{ID: 1, IsDone: false, Name: "task1"},
-		Todo{ID: 2, IsDone: false, Name: "task2"},
-	}
-
-	json, _ := json.Marshal(todoModels)
-	w.WriteHeader(200)
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Write(json)
+func register() {
+	http.HandleFunc("/load", allowAccessControl(domain.HandleLoadTodo))
+	http.HandleFunc("/save", allowAccessControl(domain.HandleSaveTodo))
 }

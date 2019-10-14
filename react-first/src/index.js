@@ -5,158 +5,6 @@ import './App.css';
 import * as serviceWorker from './serviceWorker';
 import axios from 'axios';
 
-// const API_URL = 'localhost:8080'
-
-// const GithubProfile = () => {
-
-//     const [content, setContent] = useState("api result")
-//     const userName = "teach310"
-//     const getProfile = async () => {
-//         try {
-//             const result = await axios.get(`https://api.github.com/users/${userName}`);
-//             console.log(result)
-//             console.log(result.data)
-//             setContent(JSON.stringify(result.data))
-//         } catch (error) {
-//             console.log(error);
-//         }
-//     }
-
-//     return (
-//         <div>
-//             <button onClick={() => getProfile()}>get profile!</button>
-//             {content}
-//         </div>
-//     )
-// }
-
-// const ThemeContext = React.createContext();
-
-// function Toolbar(props){
-//     return (
-//         <div>
-//             <ThemedButton />
-//         </div>
-//     );
-// }
-
-// const ThemedButton = () => (
-//     <ThemeContext.Consumer>
-//         {context=>
-//             <button onClick={context.toggleTheme}>{context.theme}</button>
-//         }
-//     </ThemeContext.Consumer>
-// )
-
-// function HookExample(){
-//     const [count, setCount] = useState(0)
-
-//     return (
-//         <div>
-//             <p>You clicked {count} times</p>
-//             <button onClick={()=>setCount(count+1)}>
-//                 Click me
-//             </button>
-//         </div>
-//     );
-// }
-
-// class Popup extends React.Component {
-//     constructor(props){
-//         super(props);
-//         this.state = {
-//             value: 'coconut'
-//         }
-//     }
-
-//     handleChange = ev => {
-//         this.setState({value: ev.target.value});
-//     }
-
-//     handleSubmit = ev => {
-//         alert("selected: " + this.state.value);
-//         ev.preventDefault();
-//     }
-
-//     render(){
-//         return (
-//             <form onSubmit={this.handleSubmit}>
-//                 <label>
-//                     Flavor　
-//                     <select value={this.state.value} onChange={this.handleChange}>
-//                         <option value="grapefruit">Grapefruit</option>
-//                         <option value="lime">Lime</option>
-//                         <option value="coconut">Coconut</option>
-//                         <option value="mango">Mango</option>
-//                     </select>
-//                 </label>
-//                 <input type="submit" value="Submit"/>
-//             </form>
-//         );
-//     }
-// }
-
-
-class InputField extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            value: 'content'
-        }
-    }
-
-    handleChange = ev => {
-        this.setState({ value: ev.target.value });
-    }
-
-    handleSubmit = ev => {
-        alert("submitted: " + this.state.value);
-        ev.preventDefault();
-    }
-
-    render() {
-        return (
-            <form onSubmit={this.handleSubmit}>
-                <label>
-                    TextArea
-                    <textarea value={this.state.value} onChange={this.handleChange} />
-                </label>
-                <input type="submit" value="Submit" />
-            </form>
-        );
-    }
-}
-
-class NameForm extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = { value: '' }
-    }
-
-    handleChange = ev => {
-        this.setState({ value: ev.target.value });
-    }
-
-    handleSubmit = ev => {
-        alert('A name was submitted: ' + this.state.value);
-        ev.preventDefault();
-    }
-
-    render() {
-        return (
-            <form onSubmit={this.handleSubmit}>
-                <label>
-                    Name:
-                    <input type="text" value={this.state.value} onChange={this.handleChange} />
-                </label>
-                <input type="submit" value="Submit" />
-            </form>
-        );
-    }
-}
-
-
-
 const Toggle = props => (
     <button onClick={props.handleClick}>
         {!props.isDone ? '□' : '■'}
@@ -181,7 +29,9 @@ const TodoList = props => {
 
     return (
         <div>
-            <ul>{listItems}</ul>
+            {
+                props.models.length != 0 ? <ul>{listItems}</ul> : 'no task'
+            }
         </div>
     );
 }
@@ -190,13 +40,7 @@ const host = "http://localhost:8080"
 
 function App() {
 
-    const initialModels = [
-        { id: 1, isDone: false, name: "anyTodo1" },
-        { id: 2, isDone: true, name: "anyTodo2" },
-        { id: 3, isDone: true, name: "anyTodo3" },
-    ];
-
-    const [todoModels, setTodoModels] = useState(initialModels);
+    const [todoModels, setTodoModels] = useState([]);
 
     const handleClick = i => {
         const temp = todoModels.slice();
@@ -222,10 +66,20 @@ function App() {
 
     const loadTodo = async () => {
         try {
-            const result = await axios.get(`http://go:8080/load`);
-            console.log(result.data)
-            console.log(result)
-            // setContent(JSON.stringify(result.data))
+            const result = await axios.get(host+`/load`);
+            setTodoModels(result.data)
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const saveTodo = async () => {
+        try {
+            const result = await axios.post(host+`/save`, todoModels);
+            console.log("save")
+            if (result.status == 200) {
+                alert("save succeeded")
+            }
         } catch (error) {
             console.log(error);
         }
@@ -236,19 +90,10 @@ function App() {
             <h1>TODOアプリ</h1>
             <div>
                 <button onClick={loadTodo}>LOAD</button>
-                <button>SAVE</button>
+                <button onClick={saveTodo}>SAVE</button>
                 <button onClick={handleAdd}>ADD</button>
             </div>
             <TodoList models={todoModels} handleClick={handleClick} handleRemove={handleRemove} handleChangeName={handleChangeName}/>
-            {/* <Toggle />
-            <NameForm />
-            <InputField />
-            <Popup />
-            <HookExample />
-            <ThemeContext.Provider value={{ theme: theme, toggleTheme: toggleTheme }}>
-                <Toolbar />
-            </ThemeContext.Provider>
-            <GithubProfile /> */}
             {/* <Butachan text="はーい" /> */}
         </div>
     );
@@ -263,7 +108,6 @@ function App() {
 //     );
 // }
 
-// ReactDOM.render(<App />, document.getElementById('root'));
 ReactDOM.render(
     <App />,
     document.getElementById('root')

@@ -1,7 +1,5 @@
 # react-web
 
-node
-yarn startで3000で起動
+## 起動方法
 
-go
-go run main.goでサーバー起動
+docker-compose up -d
