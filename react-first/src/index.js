@@ -1,36 +1,55 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
-import './App.css';
-// import butachan from './img/butachan.png';
+import Button from '@material-ui/core/Button';
+import AppBar from '@material-ui/core/AppBar';
 import * as serviceWorker from './serviceWorker';
 import axios from 'axios';
+import { makeStyles, Typography, Checkbox, TextField, IconButton, List, ListItem, Card } from '@material-ui/core';
+import DeleteIcon from '@material-ui/icons/Delete';
 
-const Toggle = props => (
-    <button onClick={props.handleClick}>
-        {!props.isDone ? '□' : '■'}
-    </button>
-);
 
-const TodoItem = props => (
-    <div>
-        <Toggle isDone={props.model.isDone} handleClick={props.handleClick}/>
-        <input type="text" value={props.model.name} onChange={ev => props.handleChangeName(ev.target.value)}/> 
-        <button onClick={props.handleRemove}>×</button>
-    </div>
-)
+const useStyles = makeStyles(theme => ({
+    horizontalButton: {
+        marginRight : theme.spacing(1),
+    },
+    container: {
+        margin: theme.spacing(1),
+    },
+    title: {
+        margin: theme.spacing(1),
+        flexGrow: 1,
+    },
+    task: {
+        padding: theme.spacing(1),
+    }
+}));
+
+
+const TodoItem = props => {
+    const classes = useStyles();
+    return (
+        <div>
+            <Card className={classes.task}>
+            <Checkbox checked={props.model.isDone} onChange={props.handleClick} />
+            <TextField value={props.model.name} onChange={ev => props.handleChangeName(ev.target.value)}/>
+            <IconButton onClick={props.handleRemove} size='small'><DeleteIcon fontSize="small"/></IconButton>
+            </Card>
+        </div>
+    );
+}
 
 const TodoList = props => {
 
     const listItems = props.models.map((m, i) =>
-        <li key={m.id}>
+        <ListItem key={m.id}>
              <TodoItem model={m} handleClick={() => props.handleClick(i)} handleRemove={() => props.handleRemove(i)} handleChangeName={value => props.handleChangeName(i, value)}/>
-        </li>
+        </ListItem>
     );
 
     return (
         <div>
             {
-                props.models.length != 0 ? <ul>{listItems}</ul> : 'no task'
+                props.models.length != 0 ? <List>{listItems}</List> : 'no task'
             }
         </div>
     );
@@ -40,6 +59,7 @@ const host = "http://localhost:8080"
 
 function App() {
 
+    const classes = useStyles();
     const [todoModels, setTodoModels] = useState([]);
 
     const handleClick = i => {
@@ -76,7 +96,6 @@ function App() {
     const saveTodo = async () => {
         try {
             const result = await axios.post(host+`/save`, todoModels);
-            console.log("save")
             if (result.status == 200) {
                 alert("save succeeded")
             }
@@ -87,26 +106,18 @@ function App() {
 
     return (
         <div>
-            <h1>TODOアプリ</h1>
-            <div>
-                <button onClick={loadTodo}>LOAD</button>
-                <button onClick={saveTodo}>SAVE</button>
-                <button onClick={handleAdd}>ADD</button>
+            <AppBar position="static">
+                <Typography variant="h6" className={classes.title}>TODOアプリ</Typography>
+            </AppBar>
+            <div className={classes.container}>
+                <Button className={classes.horizontalButton} variant="contained" onClick={loadTodo} size="small">LOAD</Button>
+                <Button className={classes.horizontalButton} variant="contained" onClick={saveTodo} size="small">SAVE</Button>
+                <Button className={classes.horizontalButton} variant="contained" onClick={handleAdd} size="small">ADD</Button>
             </div>
             <TodoList models={todoModels} handleClick={handleClick} handleRemove={handleRemove} handleChangeName={handleChangeName}/>
-            {/* <Butachan text="はーい" /> */}
         </div>
     );
 }
-
-// function Butachan(props){
-//     return (
-//         <div id="footer">
-//             <div>{props.text}</div> 
-//             <div><img src={butachan} alt="ぶたちゃん"/></div>
-//         </div>            
-//     );
-// }
 
 ReactDOM.render(
     <App />,
