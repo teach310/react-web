@@ -1,7 +1,8 @@
 package model
 
+// Todo  gormに保存するよう
 type Todo struct {
-	ID     int    `json:"id"`
-	IsDone bool   `json:"isDone"`
-	Name   string `json:"name"`
+	ID     int
+	IsDone bool
+	Name   string
 }

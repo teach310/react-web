@@ -1,7 +1,6 @@
 import React, { useState, useContext } from 'react';
 import Button from '@material-ui/core/Button';
 import AppBar from '@material-ui/core/AppBar';
-import axios from 'axios';
 import { makeStyles, Typography, Checkbox, TextField, IconButton, List, ListItem, Card, Toolbar, Menu, MenuItem } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
@@ -9,6 +8,7 @@ import { AuthProvider, AuthContext } from './auth'
 import Loading from './Loading'
 import Router from './Router'
 import Login from './Login'
+import webrequest from './webrequest'
 
 
 const useStyles = makeStyles(theme => ({
@@ -85,8 +85,6 @@ const AccountButton = () => {
     );
 }
 
-const host = "http://localhost:8080"
-
 function Todos() {
 
     const classes = useStyles();
@@ -116,8 +114,8 @@ function Todos() {
 
     const loadTodo = async () => {
         try {
-            const result = await axios.get(host+`/load`);
-            setTodoModels(result.data)
+            const result = await webrequest.get(`/load`);
+            setTodoModels(result.data.todoList)
         } catch (e) {
             console.error(e)
         }
@@ -125,7 +123,7 @@ function Todos() {
 
     const saveTodo = async () => {
         try {
-            const result = await axios.post(host+`/save`, todoModels);
+            const result = await webrequest.post(`/save`, { todoList: todoModels });
             if (result.status === 200) {
                 alert("save succeeded")
             }

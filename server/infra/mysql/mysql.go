@@ -35,3 +35,11 @@ func CloseConnect() {
 func DefaultDB() *gorm.DB {
 	return db
 }
+
+//IsErrNotFound 他でgormをimportしないために
+func IsErrNotFound(err error) bool {
+	if gorm.IsRecordNotFoundError(err) {
+		return true
+	}
+	return false
+}

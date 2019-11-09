@@ -1,72 +1,28 @@
 package domain
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"net/http"
-	"todo/infra/model"
-	"todo/infra/mysql"
+	"context"
 )
 
-func HandleLoadTodo(w http.ResponseWriter, r *http.Request) {
-	var todoList []model.Todo
-	db := mysql.DefaultDB()
-	db.Find(&todoList)
-	json, _ := json.Marshal(todoList)
-	w.WriteHeader(200)
-	w.Write(json)
+type LoadTodo struct {
+	TodoRepository TodoRepository
 }
 
-func HandleSaveTodo(w http.ResponseWriter, r *http.Request) {
-
-	defer r.Body.Close()
-	body, err := ioutil.ReadAll(r.Body)
+func (s *LoadTodo) Process(ctx context.Context) ([]Todo, error) {
+	todos, err := s.TodoRepository.FindAll(ctx)
 	if err != nil {
-		fmt.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		return nil, err
 	}
-	var todoList []model.Todo
-	if err := json.Unmarshal(body, &todoList); err != nil {
-		fmt.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	if err := setTodoList(todoList); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
+	return todos, nil
 }
 
-func setTodoList(todoList []model.Todo) (rerr error) {
-	db := mysql.DefaultDB()
-	tx := db.Begin()
-	defer func() {
-		if rerr != nil {
-			tx.Rollback()
-		}
+type SaveTodo struct {
+	TodoRepository TodoRepository
+}
 
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
-
-	// 全部消して作り直す
-	rerr = tx.Delete(model.Todo{}, "id > 0").Error
-	if rerr != nil {
-		return
+func (s *SaveTodo) Process(ctx context.Context, todoList []Todo) error {
+	if err := s.TodoRepository.Save(ctx, todoList); err != nil {
+		return err
 	}
-
-	for _, task := range todoList {
-		rerr = tx.Create(&task).Error
-		if rerr != nil {
-			return
-		}
-	}
-
-	return tx.Commit().Error
+	return nil
 }

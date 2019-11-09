@@ -4,9 +4,12 @@ import (
 	"fmt"
 	"net/http"
 
-	"todo/domain"
+	"todo/api"
 	"todo/infra/mysql"
+	"todo/infra/repository"
 )
+
+// いったんDIをここでやる？
 
 func main() {
 
@@ -39,6 +42,9 @@ func allowAccessControl(next http.HandlerFunc) http.HandlerFunc {
 }
 
 func register() {
-	http.HandleFunc("/load", allowAccessControl(domain.HandleLoadTodo))
-	http.HandleFunc("/save", allowAccessControl(domain.HandleSaveTodo))
+	todoAPI := &api.TodoAPI{
+		TodoRepository: &repository.TodoRepository{},
+	}
+	http.HandleFunc("/load", allowAccessControl(todoAPI.HandleLoadTodo))
+	http.HandleFunc("/save", allowAccessControl(todoAPI.HandleSaveTodo))
 }
