@@ -2,13 +2,15 @@ import axios from 'axios';
 
 const host = "http://localhost:8080"
 
+
+
 class HttpAPIClient {
-    async get(path){
-        return await axios.get(host+path);
+    async get(path, token){
+        return await axios.get(host+path, { headers: {'Token': token}});
     }
 
-    async post(path, data){
-        return await axios.post(host+path, data)
+    async post(path, data, token){
+        return await axios.post(host+path, data, { headers: {'Token': token}});
     }
 }
 

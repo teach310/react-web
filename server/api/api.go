@@ -36,16 +36,16 @@ func getRequestData(r *http.Request, data interface{}) error {
 	return err
 }
 
-type TodoAPI struct {
+type TodoHandler struct {
 	TodoRepository domain.TodoRepository
 }
 
-func (api *TodoAPI) HandleLoadTodo(w http.ResponseWriter, r *http.Request) {
+func (api *TodoHandler) HandleLoadTodo(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	service := &domain.LoadTodo{
 		TodoRepository: api.TodoRepository,
 	}
-	domainTodoList, err := service.Process(ctx)
+	domainTodoList, err := service.Run(ctx)
 	if err != nil {
 		respond(w, http.StatusInternalServerError, err)
 		return
@@ -66,7 +66,7 @@ func (api *TodoAPI) HandleLoadTodo(w http.ResponseWriter, r *http.Request) {
 	respondJson(w, 200, responseData)
 }
 
-func (api *TodoAPI) HandleSaveTodo(w http.ResponseWriter, r *http.Request) {
+func (api *TodoHandler) HandleSaveTodo(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	requestData := &SaveTodoRequest{}
 	if err := getRequestData(r, requestData); err != nil {
@@ -86,7 +86,7 @@ func (api *TodoAPI) HandleSaveTodo(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	if err := service.Process(ctx, todoList); err != nil {
+	if err := service.Run(ctx, todoList); err != nil {
 		respond(w, http.StatusInternalServerError, err)
 		return
 	}

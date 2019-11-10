@@ -6,7 +6,7 @@ const AuthContext = createContext()
 const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true)
     const [currentUser, setCurrentUser] = useState(null)
-
+    const [accessToken, setAccessToken] = useState(null)
     
     const auth = firebase.auth()
 
@@ -29,14 +29,18 @@ const AuthProvider = ({ children }) => {
     }, [auth])
 
     useEffect(() => {
-        auth.onAuthStateChanged(user => {
+        // Loginしてるときにしかここに来れないのでuserがnullということはない
+        auth.onAuthStateChanged(async user => {
+            const token = await user.getIdToken();
+            setAccessToken(token)
             setLoading(false)
             setCurrentUser(user)
+            console.log(user)
         })
     }, [auth])
 
     return (
-        <AuthContext.Provider value={{ currentUser, signin, signout, loading }}>
+        <AuthContext.Provider value={{ currentUser, accessToken, signin, signout, loading }}>
             {children}
         </AuthContext.Provider>
     )

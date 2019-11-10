@@ -89,6 +89,7 @@ function Todos() {
 
     const classes = useStyles();
     const [todoModels, setTodoModels] = useState([]);
+    const { accessToken } = useContext(AuthContext);
 
     const handleClick = i => {
         const temp = todoModels.slice();
@@ -114,7 +115,7 @@ function Todos() {
 
     const loadTodo = async () => {
         try {
-            const result = await webrequest.get(`/load`);
+            const result = await webrequest.get(`/load`, accessToken);
             setTodoModels(result.data.todoList)
         } catch (e) {
             console.error(e)
@@ -123,7 +124,7 @@ function Todos() {
 
     const saveTodo = async () => {
         try {
-            const result = await webrequest.post(`/save`, { todoList: todoModels });
+            const result = await webrequest.post(`/save`, { todoList: todoModels , accessToken});
             if (result.status === 200) {
                 alert("save succeeded")
             }
