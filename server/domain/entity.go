@@ -2,13 +2,14 @@ package domain
 
 import "context"
 
-type Todo struct {
-	ID     int
-	IsDone bool
-	Name   string
+type Task struct {
+	ID      string
+	IsDone  bool
+	Name    string
+	OwnerID string
 }
 
-type TodoRepository interface {
-	FindAll(ctx context.Context) ([]Todo, error)
-	Save(ctx context.Context, todoList []Todo) error
+type TaskRepository interface {
+	FindAllByOwnerID(ctx context.Context, ownerID string) ([]Task, error)
+	Save(ctx context.Context, ownerID string, tasks []Task) error
 }

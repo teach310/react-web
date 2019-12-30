@@ -29,9 +29,16 @@ const useStyles = makeStyles(theme => ({
 
 export default () => {
     const classes = useStyles();
-    const { signin } = useContext(AuthContext)
+    const { signin, authState } = useContext(AuthContext)
+
+    let authLog;
+    if (authState) {
+        authLog = authState
+    }
 
     return (
+        <>
+        { authLog }
         <Box className={classes.root}>
             <Card className={classes.card}>
                 <CardContent className={classes.content}>
@@ -44,5 +51,6 @@ export default () => {
                 </CardActions>
             </Card>
         </Box>
+        </>
     )
 }

@@ -3,6 +3,7 @@ package authhttp
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"todo/auth"
 	"todo/infra/firebase"
@@ -26,7 +27,8 @@ func New(ctx context.Context) (*Handler, error) {
 func (h *Handler) Handle(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := r.Header.Get("Token")
-		if token == "" {
+
+		if token == "undefined" {
 			w.WriteHeader(http.StatusBadRequest)
 			fmt.Fprint(w, "no token")
 			return
@@ -34,8 +36,9 @@ func (h *Handler) Handle(handler http.Handler) http.Handler {
 		ctx := r.Context()
 		account, err := h.firebaseAuth.VerifyIDToken(ctx, token)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(http.StatusUnauthorized)
 			fmt.Fprintf(w, "error: verify id token %v", err)
+			log.Printf("error verify id token %v token: %v", err, token)
 			return
 		}
 		ctx = auth.SetAccountOnContect(r.Context(), account)
@@ -46,7 +49,8 @@ func (h *Handler) Handle(handler http.Handler) http.Handler {
 func (h *Handler) HandleFunc(handler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		token := r.Header.Get("Token")
-		if token == "" {
+
+		if token == "undefined" {
 			w.WriteHeader(http.StatusBadRequest)
 			fmt.Fprint(w, "no token")
 			return
@@ -54,8 +58,9 @@ func (h *Handler) HandleFunc(handler http.HandlerFunc) http.HandlerFunc {
 		ctx := r.Context()
 		account, err := h.firebaseAuth.VerifyIDToken(ctx, token)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(http.StatusUnauthorized)
 			fmt.Fprintf(w, "error: verify id token %v", err)
+			log.Printf("error verify id token %v token: %v", err, token)
 			return
 		}
 		ctx = auth.SetAccountOnContect(r.Context(), account)

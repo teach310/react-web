@@ -3,7 +3,13 @@ package api
 // RequestとかResponseとか　いずれは自動生成したい
 
 type LoadTodoResponse struct {
-	TodoList []Todo `json:"todoList"`
+	TodoList []UniqueTodo `json:"todoList"`
+}
+
+type UniqueTodo struct {
+	ID     string `json:"id"`
+	IsDone bool   `json:"isDone"`
+	Name   string `json:"name"`
 }
 
 type Todo struct {

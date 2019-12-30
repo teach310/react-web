@@ -21,7 +21,7 @@ func Connect() *gorm.DB {
 
 // Migrate マイグレーション
 func Migrate() {
-	db.AutoMigrate(&model.Todo{})
+	db.AutoMigrate(&model.Task{})
 }
 
 // CloseConnect 接続を切る

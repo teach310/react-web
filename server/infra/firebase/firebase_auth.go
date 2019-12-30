@@ -1,11 +1,10 @@
 package firebase
 
 import (
-	"log"
-
 	"todo/auth"
 
 	firebaseAuth "firebase.google.com/go/auth"
+	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 )
 
@@ -29,8 +28,7 @@ func (a *FirebaseAuth) VerifyIDToken(ctx context.Context, idToken string) (auth.
 	// auth.TokenはFirebaseIDTokenをデコードしたもの。UIDがUserID
 	token, err := a.client.VerifyIDToken(ctx, idToken)
 	if err != nil {
-		log.Fatalf("error verifying ID token: %v\n", err)
-		return auth.Account{}, err
+		return auth.Account{}, errors.WithStack(err)
 	}
 	account := auth.Account{
 		UserID: token.UID,

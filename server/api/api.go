@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"todo/auth"
 	"todo/domain"
 )
 
@@ -37,13 +38,20 @@ func getRequestData(r *http.Request, data interface{}) error {
 }
 
 type TodoHandler struct {
-	TodoRepository domain.TodoRepository
+	TaskRepository domain.TaskRepository
 }
 
 func (api *TodoHandler) HandleLoadTodo(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	account, ok := auth.GetAccountFromContext(ctx)
+	if !ok {
+		respond(w, http.StatusBadRequest, "account not found")
+		return
+	}
+
 	service := &domain.LoadTodo{
-		TodoRepository: api.TodoRepository,
+		OwnerID:        account.UserID,
+		TaskRepository: api.TaskRepository,
 	}
 	domainTodoList, err := service.Run(ctx)
 	if err != nil {
@@ -51,9 +59,9 @@ func (api *TodoHandler) HandleLoadTodo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	todoList := make([]Todo, 0, len(domainTodoList))
+	todoList := make([]UniqueTodo, 0, len(domainTodoList))
 	for _, data := range domainTodoList {
-		todoList = append(todoList, Todo{
+		todoList = append(todoList, UniqueTodo{
 			ID:     data.ID,
 			IsDone: data.IsDone,
 			Name:   data.Name,
@@ -68,25 +76,32 @@ func (api *TodoHandler) HandleLoadTodo(w http.ResponseWriter, r *http.Request) {
 
 func (api *TodoHandler) HandleSaveTodo(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	account, ok := auth.GetAccountFromContext(ctx)
+	if !ok {
+		respond(w, http.StatusBadRequest, "account not found")
+		return
+	}
+
 	requestData := &SaveTodoRequest{}
 	if err := getRequestData(r, requestData); err != nil {
 		respond(w, http.StatusBadRequest, err)
 		return
 	}
 	service := &domain.SaveTodo{
-		TodoRepository: api.TodoRepository,
+		OwnerID:        account.UserID,
+		TaskRepository: api.TaskRepository,
 	}
 
-	todoList := make([]domain.Todo, 0, len(requestData.TodoList))
+	tasks := make([]domain.Task, 0, len(requestData.TodoList))
 	for _, data := range requestData.TodoList {
-		todoList = append(todoList, domain.Todo{
-			ID:     data.ID,
-			IsDone: data.IsDone,
-			Name:   data.Name,
+		tasks = append(tasks, domain.Task{
+			IsDone:  data.IsDone,
+			Name:    data.Name,
+			OwnerID: account.UserID,
 		})
 	}
 
-	if err := service.Run(ctx, todoList); err != nil {
+	if err := service.Run(ctx, tasks); err != nil {
 		respond(w, http.StatusInternalServerError, err)
 		return
 	}

@@ -14,16 +14,27 @@ import (
 
 var authHandler *authhttp.Handler
 
+const (
+	dbType = 2 // 1: mysql 2: firestore
+)
+
 func main() {
 
-	mysql.Connect()
-	defer mysql.CloseConnect()
-	mysql.Migrate()
+	if dbType == 1 {
+		mysql.Connect()
+		defer mysql.CloseConnect()
+		mysql.Migrate()
+	}
 
 	ctx := context.Background()
 	if err := firebase.Init(ctx); err != nil {
 		log.Println("error: firebase initialize", err)
 		return
+	}
+
+	if dbType == 2 {
+		firebase.InitDefaultFirestoreClient(ctx)
+		defer firebase.CloseDefaultFirestoreClient()
 	}
 
 	ah, err := authhttp.New(ctx)
@@ -59,8 +70,57 @@ func allowAccessControl(next http.HandlerFunc) http.HandlerFunc {
 
 func register() {
 	todoAPI := &api.TodoHandler{
-		TodoRepository: &repository.TodoRepository{},
+		// TaskRepository: &repository.TaskRepository{},
+		TaskRepository: &repository.FSTaskRepository{},
 	}
 	http.HandleFunc("/load", allowAccessControl(authHandler.HandleFunc(todoAPI.HandleLoadTodo)))
 	http.HandleFunc("/save", allowAccessControl(authHandler.HandleFunc(todoAPI.HandleSaveTodo)))
+
+	http.HandleFunc("/test", allowAccessControl(test))
+	http.HandleFunc("/testread", allowAccessControl(testread))
+}
+
+func test(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	client, err := firebase.NewFirestore(ctx)
+	if err != nil {
+		panic(err)
+	}
+	defer client.Close()
+	// Setで上書き
+	_, err = client.Doc("users/1").Set(ctx, map[string]interface{}{
+		"first": "Ada",
+		"last":  "Lovelace",
+		"born":  1815,
+	})
+	if err != nil {
+		log.Fatalf("Failed adding alovelace: %v", err)
+	}
+	fmt.Fprintln(w, "ok")
+}
+
+func testread(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	client, err := firebase.NewFirestore(ctx)
+	if err != nil {
+		panic(err)
+	}
+	defer client.Close()
+
+	type User struct {
+		First string `firestore:"first"`
+		Last  string `firestore:"last"`
+		Born  int    `firestore:"born"`
+	}
+
+	// Getで取得
+	docsnap, err := client.Doc("users/1").Get(ctx)
+	if err != nil {
+		panic(err)
+	}
+	user := &User{}
+	if err := docsnap.DataTo(user); err != nil {
+		panic(err)
+	}
+	fmt.Fprintln(w, fmt.Sprintf("%v", user))
 }

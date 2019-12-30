@@ -6,59 +6,60 @@ package mock_domain
 
 import (
 	context "context"
-	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
 	domain "todo/domain"
+
+	gomock "github.com/golang/mock/gomock"
 )
 
-// MockTodoRepository is a mock of TodoRepository interface
-type MockTodoRepository struct {
+// MockTaskRepository is a mock of TaskRepository interface
+type MockTaskRepository struct {
 	ctrl     *gomock.Controller
-	recorder *MockTodoRepositoryMockRecorder
+	recorder *MockTaskRepositoryMockRecorder
 }
 
-// MockTodoRepositoryMockRecorder is the mock recorder for MockTodoRepository
-type MockTodoRepositoryMockRecorder struct {
-	mock *MockTodoRepository
+// MockTaskRepositoryMockRecorder is the mock recorder for MockTaskRepository
+type MockTaskRepositoryMockRecorder struct {
+	mock *MockTaskRepository
 }
 
-// NewMockTodoRepository creates a new mock instance
-func NewMockTodoRepository(ctrl *gomock.Controller) *MockTodoRepository {
-	mock := &MockTodoRepository{ctrl: ctrl}
-	mock.recorder = &MockTodoRepositoryMockRecorder{mock}
+// NewMockTaskRepository creates a new mock instance
+func NewMockTaskRepository(ctrl *gomock.Controller) *MockTaskRepository {
+	mock := &MockTaskRepository{ctrl: ctrl}
+	mock.recorder = &MockTaskRepositoryMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockTodoRepository) EXPECT() *MockTodoRepositoryMockRecorder {
+func (m *MockTaskRepository) EXPECT() *MockTaskRepositoryMockRecorder {
 	return m.recorder
 }
 
-// FindAll mocks base method
-func (m *MockTodoRepository) FindAll(ctx context.Context) ([]domain.Todo, error) {
+// FindAllByOwnerID mocks base method
+func (m *MockTaskRepository) FindAllByOwnerID(ctx context.Context, ownerID string) ([]domain.Task, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindAll", ctx)
-	ret0, _ := ret[0].([]domain.Todo)
+	ret := m.ctrl.Call(m, "FindAllByOwnerID", ctx, ownerID)
+	ret0, _ := ret[0].([]domain.Task)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// FindAll indicates an expected call of FindAll
-func (mr *MockTodoRepositoryMockRecorder) FindAll(ctx interface{}) *gomock.Call {
+// FindAllByOwnerID indicates an expected call of FindAllByOwnerID
+func (mr *MockTaskRepositoryMockRecorder) FindAllByOwnerID(ctx, ownerID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAll", reflect.TypeOf((*MockTodoRepository)(nil).FindAll), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAllByOwnerID", reflect.TypeOf((*MockTaskRepository)(nil).FindAllByOwnerID), ctx, ownerID)
 }
 
 // Save mocks base method
-func (m *MockTodoRepository) Save(ctx context.Context, todoList []domain.Todo) error {
+func (m *MockTaskRepository) Save(ctx context.Context, ownerID string, tasks []domain.Task) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Save", ctx, todoList)
+	ret := m.ctrl.Call(m, "Save", ctx, ownerID, tasks)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Save indicates an expected call of Save
-func (mr *MockTodoRepositoryMockRecorder) Save(ctx, todoList interface{}) *gomock.Call {
+func (mr *MockTaskRepositoryMockRecorder) Save(ctx, ownerID, tasks interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockTodoRepository)(nil).Save), ctx, todoList)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockTaskRepository)(nil).Save), ctx, ownerID, tasks)
 }

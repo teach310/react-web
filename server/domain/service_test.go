@@ -13,24 +13,36 @@ import (
 func TestMain(m *testing.M) {
 }
 
-func TestLoadTodo_Process(t *testing.T) {
+func TestLoadTodo_Run(t *testing.T) {
 	type args struct {
-		ctx context.Context
+		ctx     context.Context
+		ownerID string
+	}
+
+	type recorders struct {
+		taskRepository *mock_domain.MockTaskRepositoryMockRecorder
 	}
 
 	tests := []struct {
 		name    string
 		args    args
-		want    []domain.Todo
+		record  func(recorders recorders, args args)
+		want    []domain.Task
 		wantErr bool
 	}{
 		{
 			name: "正常系",
 			args: args{
-				ctx: context.Background(),
+				ctx:     context.Background(),
+				ownerID: "dummy_owner01",
 			},
-			want: []domain.Todo{
-				domain.Todo{ID: 1, IsDone: false, Name: "task"},
+			record: func(recorders recorders, args args) {
+				recorders.taskRepository.FindAllByOwnerID(args.ctx, args.ownerID).Return([]domain.Task{
+					domain.Task{ID: 1, IsDone: false, Name: "task", OwnerID: "dummy_owner01"},
+				})
+			},
+			want: []domain.Task{
+				domain.Task{ID: 1, IsDone: false, Name: "task", OwnerID: "dummy_owner01"},
 			},
 			wantErr: false,
 		},
@@ -39,21 +51,25 @@ func TestLoadTodo_Process(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
-			m := mock_domain.NewMockTodoRepository(ctrl)
-			m.EXPECT().FindAll(tt.args.ctx).Return([]domain.Todo{
-				domain.Todo{ID: 1, IsDone: false, Name: "task"},
-			})
+			m := mock_domain.NewMockTaskRepository(ctrl)
+			if tt.record != nil {
+				recorders := recorders{
+					taskRepository: m.EXPECT(),
+				}
+				tt.record(recorders, tt.args)
+			}
 
 			s := &domain.LoadTodo{
-				TodoRepository: m,
+				OwnerID:        tt.args.ownerID,
+				TaskRepository: m,
 			}
-			got, err := s.Process(tt.args.ctx)
+			got, err := s.Run(tt.args.ctx)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("LoadTodo.Process() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("LoadTodo.Run() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("LoadTodo.Process() = %v, want %v", got, tt.want)
+				t.Errorf("LoadTodo.Run() = %v, want %v", got, tt.want)
 			}
 		})
 	}
